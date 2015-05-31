@@ -1,5 +1,4 @@
 import os
-from minmax import Minmax
 from players import *
 
 
@@ -28,7 +27,7 @@ class ConnectFour(object):
         self._players[1] = ComputerPlayer(self._colors[1])
         # display players's status
         for i in xrange(0, 1):
-            print("%s joue avec %s", self._players[i].type, self._colors[i])
+            print('%s joue avec %s ' % (self._players[i].type, self._colors[i]))
 
         # x always goes first (arbitrary choice on my part)
         self._current_player = self._players[0]
@@ -54,9 +53,11 @@ class ConnectFour(object):
             self._current_player = self._players[0]
 
     def _next_move(self):
+        """ Handle the next move
+        """
         # move is the column that player want's to play
         column = self._current_player.move(self._grid)
-
+        # search the available line in the selected column
         for i in xrange(self._GRID_HEIGHT):
             if self._grid[i][column] == ' ':
                 # Set the color in the grid
@@ -74,32 +75,36 @@ class ConnectFour(object):
         return
 
     def _check_state(self):
+        """ Check if the grid is full and if there is a connect four
+        """
         if self._is_full():
             self._finished = True
-        elif self.is_connect_four():
+        elif self._is_connect_four():
             self._finished = True
             self._winner = self._current_player
 
     def _is_full(self):
-        """ check if the grid is full
+        """ Check if the grid is full
         """
-        return self._round > 42
+        # the number of round can't be superior to the number of case of the grid
+        return self._round > self._GRID_WIDTH * self._GRID_HEIGHT
 
-    def is_connect_four(self):
+    def _is_connect_four(self):
+        """ Search a connect four in the grid
+        """
         # for each piece in the grid...
         for i in xrange(self._GRID_HEIGHT):
             for j in xrange(self._GRID_WIDTH):
                 if self._grid[i][j] != ' ':
-                    # check if a vertical four-in-a-row starts at (i, j)
+                    # check for vertical connect four
                     if self._check_for_vertical_four(i, j):
                         return True
 
-                    # check if a horizontal four-in-a-row starts at (i, j)
+                    # check for horizontal connect four
                     if self._check_for_horizontal_four(i, j):
                         return True
 
-                    # check if a diagonal (either way) four-in-a-row starts at (i, j)
-                    # also, get the slope of the four if there is one
+                    # check for diagonal connect four
                     if self._check_for_diagonal_four(i, j):
                         return True
 
@@ -109,13 +114,14 @@ class ConnectFour(object):
         consecutive_count = 0
 
         if row + 3 < self._GRID_HEIGHT:
+            # search a connect four
             for i in xrange(4):
-                print("check vert")
                 if self._grid[row][col].lower() == self._grid[row + i][col].lower():
                     consecutive_count += 1
                 else:
                     break
 
+            # define the winner
             if consecutive_count == 4:
                 if self._players[0].color.lower() == self._grid[row][col].lower():
                     self._winner = self._players[0]
@@ -129,13 +135,14 @@ class ConnectFour(object):
         consecutive_count = 0
 
         if col + 3 < self._GRID_WIDTH:
+            # search a connect four
             for i in xrange(4):
-                print("check hor")
                 if self._grid[row][col].lower() == self._grid[row][col + i].lower():
                     consecutive_count += 1
                 else:
                     break
 
+            # define the winner
             if consecutive_count == 4:
                 if self._players[0].color.lower() == self._grid[row][col].lower():
                     self._winner = self._players[0]
@@ -150,12 +157,14 @@ class ConnectFour(object):
 
         # check positive slope
         if row + 3 < self._GRID_HEIGHT and col + 3 < self._GRID_WIDTH:
+            # search a connect four
             for i in xrange(4):
                 if self._grid[row][col].lower() == self._grid[row + i][col + i].lower():
                     consecutive_count += 1
                 else:
                     break
 
+            # define the winner
             if consecutive_count == 4:
                 if self._players[0].color.lower() == self._grid[row][col].lower():
                     self._winner = self._players[0]
@@ -165,12 +174,13 @@ class ConnectFour(object):
 
         # check negative slope
         if row - 3 >= 0 and col - 3 >= 0:
+            # search a connect four
             for i in xrange(4):
                 if self._grid[row][col].lower() == self._grid[row - i][col - i].lower():
                     consecutive_count += 1
                 else:
                     break
-
+            # define the winner
             if consecutive_count == 4:
                 if self._players[0].color.lower() == self._grid[row][col].lower():
                     self._winner = self._players[0]
@@ -181,18 +191,30 @@ class ConnectFour(object):
         return False
 
     def _print_state(self):
+        """ Print state of the game (round, grid, winner)
+        """
         # cross-platform clear screen
         os.system(['clear', 'cls'][os.name == 'nt'])
-        print("Round: " + str(self._round))
-
+        # print the round
+        print("             Round: " + str(self._round))
+        print("")
+        # print the grid
         for i in xrange(self._GRID_HEIGHT - 2, -1, -1):
             print("\t"),
             for j in xrange(self._GRID_WIDTH):
                 print("| " + str(self._grid[i][j])),
             print("|")
-        print("\t  _   _   _   _   _   _   _ ")
-        print("\t  1   2   3   4   5   6   7 ")
+        print("\t"),
+        # print the bottom of the grid with column indexes
+        for k in xrange(self._GRID_WIDTH):
+            print("  _"),
+        print("")
+        print("\t"),
+        for k in xrange(self._GRID_WIDTH):
+            print("  %d" % (k + 1)),
+        print("")
 
+        # print final message when the game is finished
         if self._finished:
             print("Game Over!")
             if self._winner != None:
