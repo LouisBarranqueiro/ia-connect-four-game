@@ -9,4 +9,4 @@ def main():
     connect_four.start()
 
 if __name__ == "__main__": # Default "main method" idiom.
-        main()
+    main()
