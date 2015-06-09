@@ -1,19 +1,22 @@
 import os
 from abc import ABCMeta, abstractmethod
 
+CONNECT_FOUR_GRID_WIDTH = 7
+CONNECT_FOUR_GRID_HEIGHT = 6
+CONNECT_FOUR_COLORS = ["x", "o"]
 
 class ConnectFour(object):
     """ Connect Four game
     """
-    _GRID_WIDTH = 7
-    _GRID_HEIGHT = 6
+    _GRID_WIDTH = CONNECT_FOUR_GRID_WIDTH
+    _GRID_HEIGHT = CONNECT_FOUR_GRID_HEIGHT
     _grid = None
     _round = None
     _finished = False
     _winner = None
     _current_player = None
     _players = [None, None]
-    _COLORS = ["x", "o"]
+    _COLORS = CONNECT_FOUR_COLORS
 
     def __init__(self):
         self._round = 1
@@ -292,7 +295,7 @@ class _HumanPlayer(_Player):
 
 
 class _ComputerPlayer(_Player):
-    """ Computer Player controled by an IA (Minmax algorythm)
+    """ Computer Player controlled by an IA (MinMax algorithm)
     """
 
     _DIFFICULTY = 5
@@ -311,23 +314,22 @@ class _ComputerPlayer(_Player):
         """
         Return the best "move" (column index) calculated by IA
         :param grid: the current grid of the game
-        :return best_move:
+        :return: the best move found by IA (MinMax algorithm)
         """
-        best_move, value = self._get_best_move(grid)
-        return best_move
+        return self._get_best_move(grid)
 
     def _get_best_move(self, grid):
         """ Returns the best "move" (column index) and the associated alpha
         """
         # determine opponent's color
-        if self._color == "x":
-            human_color = "o"
+        if self._color == CONNECT_FOUR_COLORS[0]:
+            human_color = CONNECT_FOUR_COLORS[1]
         else:
-            human_color = "x"
+            human_color = CONNECT_FOUR_COLORS[0]
 
         # enumerate all legal moves
         legal_moves = {}  # will map legal move states to their alpha values
-        for col in xrange(7):
+        for col in xrange(CONNECT_FOUR_GRID_HEIGHT):
             # if column i is a legal move...
             if self._is_legal_move(col, grid):
                 # make the move in column 'col' for curr_player
@@ -337,12 +339,13 @@ class _ComputerPlayer(_Player):
         best_alpha = -99999999
         best_move = None
         moves = legal_moves.items()
+        # search the best `move` with the highest `alpha` value
         for move, alpha in moves:
             if alpha >= best_alpha:
                 best_alpha = alpha
                 best_move = move
 
-        return best_move, best_alpha
+        return best_move
 
     def _search(self, depth, grid, curr_player_color):
         """ Searches the tree at depth 'depth'
@@ -353,7 +356,7 @@ class _ComputerPlayer(_Player):
         """
         # enumerate all legal moves from this state
         legal_moves = []
-        for i in xrange(7):
+        for i in xrange(CONNECT_FOUR_GRID_HEIGHT):
             # if column i is a legal move...
             if self._is_legal_move(i, grid):
                 # simulate the move in column i for curr_player
@@ -366,10 +369,10 @@ class _ComputerPlayer(_Player):
             return self._eval_game(depth, grid, curr_player_color)
 
         # determine opponent's color
-        if curr_player_color == "x":
-            opp_player_color = "o"
+        if curr_player_color == CONNECT_FOUR_COLORS[0]:
+            opp_player_color = CONNECT_FOUR_COLORS[1]
         else:
-            opp_player_color = "x"
+            opp_player_color = CONNECT_FOUR_COLORS[0]
 
         alpha = -99999999
         for child in legal_moves:
@@ -381,7 +384,7 @@ class _ComputerPlayer(_Player):
     def _is_legal_move(self, column, grid):
         """ Boolean function to check if a move (column) is a legal move
         """
-        for i in xrange(6):
+        for i in xrange(CONNECT_FOUR_GRID_HEIGHT - 1):
             if grid[i][column] == ' ':
                 # once we find the first empty, we know it's a legal move
                 return True
@@ -405,7 +408,7 @@ class _ComputerPlayer(_Player):
         """
 
         tmp_grid = [x[:] for x in grid]
-        for i in xrange(6):
+        for i in xrange(CONNECT_FOUR_GRID_WIDTH):
             if tmp_grid[i][column] == ' ':
                 tmp_grid[i][column] = color
                 return tmp_grid
@@ -413,10 +416,10 @@ class _ComputerPlayer(_Player):
     def _eval_game(self, depth, grid, player_color):
         """ Evaluate the game with its grid
         """
-        if player_color == "x":
-            opp_color = "o"
+        if player_color == CONNECT_FOUR_COLORS[0]:
+            opp_color = CONNECT_FOUR_COLORS[1]
         else:
-            opp_color = "x"
+            opp_color = CONNECT_FOUR_COLORS[0]
 
         ia_fours = self._check_streak(grid, player_color, 4)
         ia_threes = self._check_streak(grid, player_color, 3)
@@ -431,25 +434,26 @@ class _ComputerPlayer(_Player):
 
     def _check_streak(self, grid, color, streak):
         count = 0
-        # for each piece in the board...
-        for i in xrange(6):
-            for j in xrange(7):
+        # for each box in the grid...
+        for i in xrange(CONNECT_FOUR_GRID_HEIGHT - 1):
+            for j in xrange(CONNECT_FOUR_GRID_WIDTH - 1):
                 # ...that is of the color we're looking for...
                 if grid[i][j].lower() == color.lower():
-                    # check if a vertical streak starts at (i, j)
+                    # check if a vertical streak starts at index [i][j] of the grid game
                     count += self._check_vertical_streak(i, j, grid, streak)
 
-                    # check if a horizontal four-in-a-row starts at (i, j)
+                    # check if a horizontal streak starts at index [i][j] of the grid game
                     count += self._check_horizontal_streak(i, j, grid, streak)
 
-                    # check if a diagonal (either way) four-in-a-row starts at (i, j)
+                    # check if a diagonal streak starts at index [i][j] of the grid game
                     count += self._check_diagonal_streak(i, j, grid, streak)
         # return the sum of streaks of length 'streak'
+
         return count
 
     def _check_vertical_streak(self, row, col, grid, streak):
         consecutive_count = 0
-        for i in xrange(row, 6):
+        for i in xrange(row, CONNECT_FOUR_GRID_HEIGHT):
             if grid[i][col].lower() == grid[row][col].lower():
                 consecutive_count += 1
             else:
@@ -462,7 +466,7 @@ class _ComputerPlayer(_Player):
 
     def _check_horizontal_streak(self, row, col, grid, streak):
         consecutive_count = 0
-        for j in xrange(col, 7):
+        for j in xrange(col, CONNECT_FOUR_GRID_WIDTH):
             if grid[row][j].lower() == grid[row][col].lower():
                 consecutive_count += 1
             else:
@@ -479,8 +483,8 @@ class _ComputerPlayer(_Player):
         # check for diagonals with positive slope
         consecutive_count = 0
         j = col
-        for i in xrange(row, 6):
-            if j > 6:
+        for i in xrange(row, CONNECT_FOUR_GRID_WIDTH):
+            if j > CONNECT_FOUR_GRID_WIDTH:
                 break
             elif grid[i][j].lower() == grid[row][col].lower():
                 consecutive_count += 1
@@ -495,7 +499,7 @@ class _ComputerPlayer(_Player):
         consecutive_count = 0
         j = col
         for i in xrange(row, -1, -1):
-            if j > 6:
+            if j > CONNECT_FOUR_GRID_WIDTH:
                 break
             elif grid[i][j].lower() == grid[row][col].lower():
                 consecutive_count += 1
