@@ -1,6 +1,5 @@
 import os
 from abc import ABCMeta, abstractmethod
-import random
 
 
 class ConnectFour(object):
@@ -14,7 +13,7 @@ class ConnectFour(object):
     _winner = None
     _current_player = None
     _players = [None, None]
-    _colors = ["x", "o"]
+    _COLORS = ["x", "o"]
 
     def __init__(self):
         self._round = 1
@@ -24,11 +23,11 @@ class ConnectFour(object):
         # cross-platform clear screen
         os.system(['clear', 'cls'][os.name == 'nt'])
         # init players with their "colors"
-        self._players[0] = _HumanPlayer(self._colors[0])
-        self._players[1] = _ComputerPlayer(self._colors[1])
+        self._players[0] = _HumanPlayer(self._COLORS[0])
+        self._players[1] = _ComputerPlayer(self._COLORS[1])
         # display players's status
-        for i in xrange(1):
-            print('%s joue avec %s ' % (self._players[i]._type, self._colors[i]))
+        for i in xrange(2):
+            print('%s joue avec %s ' % (self._players[i]._type, self._COLORS[i]))
 
         # x always goes first
         self._current_player = self._players[0]
@@ -297,7 +296,6 @@ class _ComputerPlayer(_Player):
     """
 
     _DIFFICULTY = 5
-    _board = None
     _colors = ["x", "o"]
 
     def __init__(self, color):
@@ -315,33 +313,30 @@ class _ComputerPlayer(_Player):
         :param grid: the current grid of the game
         :return best_move:
         """
-        best_move, value = self._get_best_move(self._DIFFICULTY, grid, self._color)
+        best_move, value = self._get_best_move(grid)
         return best_move
 
-    def _get_best_move(self, depth, state, curr_player):
+    def _get_best_move(self, grid):
         """ Returns the best "move" (column index) and the associated alpha
         """
         # determine opponent's color
-        self._board = [x[:] for x in state]
-
-        if curr_player == self._colors[0]:
-            opp_player = self._colors[1]
+        if self._color == "x":
+            human_color = "o"
         else:
-            opp_player = self._colors[0]
+            human_color = "x"
 
         # enumerate all legal moves
         legal_moves = {}  # will map legal move states to their alpha values
         for col in xrange(7):
             # if column i is a legal move...
-            if self._is_legal_move(col, state):
+            if self._is_legal_move(col, grid):
                 # make the move in column 'col' for curr_player
-                temp = self._make_move(state, col, curr_player)
-                legal_moves[col] = -self._search(depth - 1, temp, opp_player)
+                tmp_grid = self._simulate_move(grid, col, self._color)
+                legal_moves[col] = -self._search(self._DIFFICULTY - 1, tmp_grid, human_color)
 
         best_alpha = -99999999
         best_move = None
         moves = legal_moves.items()
-        random.shuffle(moves)
         for move, alpha in moves:
             if alpha >= best_alpha:
                 best_alpha = alpha
@@ -349,7 +344,7 @@ class _ComputerPlayer(_Player):
 
         return best_move, best_alpha
 
-    def _search(self, depth, state, curr_player):
+    def _search(self, depth, grid, curr_player_color):
         """ Searches the tree at depth 'depth'
             By default, the state is the board, and curr_player is whomever
             called this search
@@ -360,105 +355,102 @@ class _ComputerPlayer(_Player):
         legal_moves = []
         for i in xrange(7):
             # if column i is a legal move...
-            if self._is_legal_move(i, state):
-                # make the move in column i for curr_player
-                temp = self._make_move(state, i, curr_player)
-                legal_moves.append(temp)
+            if self._is_legal_move(i, grid):
+                # simulate the move in column i for curr_player
+                tmp_grid = self._simulate_move(grid, i, curr_player_color)
+                legal_moves.append(tmp_grid)
 
         # if this node (state) is a terminal node or depth == 0...
-        if depth == 0 or len(legal_moves) == 0 or self._game_is_over(state):
+        if depth == 0 or len(legal_moves) == 0 or self._game_is_over(grid):
             # return the heuristic value of node
-            return self._eval(state, curr_player)
+            return self._eval_game(depth, grid, curr_player_color)
 
         # determine opponent's color
-        if curr_player == self._colors[0]:
-            opp_player = self._colors[1]
+        if curr_player_color == "x":
+            opp_player_color = "o"
         else:
-            opp_player = self._colors[0]
+            opp_player_color = "x"
 
         alpha = -99999999
         for child in legal_moves:
             if child == None:
                 print("child == None (search)")
-            alpha = max(alpha, -self._search(depth - 1, child, opp_player))
+            alpha = max(alpha, -self._search(depth - 1, child, opp_player_color))
         return alpha
 
-    def _is_legal_move(self, column, state):
+    def _is_legal_move(self, column, grid):
         """ Boolean function to check if a move (column) is a legal move
         """
         for i in xrange(6):
-            if state[i][column] == ' ':
+            if grid[i][column] == ' ':
                 # once we find the first empty, we know it's a legal move
                 return True
 
         # if we get here, the column is full
         return False
 
-    def _game_is_over(self, state):
-        if self._check_streak(state, self._colors[0], 4) >= 1:
+    def _game_is_over(self, grid):
+        if self._check_streak(grid, self._colors[0], 4) >= 1:
             return True
-        elif self._check_streak(state, self._colors[1], 4) >= 1:
+        elif self._check_streak(grid, self._colors[1], 4) >= 1:
             return True
         else:
             return False
 
-    def _make_move(self, state, column, color):
+    def _simulate_move(self, grid, column, color):
         """ Change a state object to reflect a player, denoted by color,
             making a move at column 'column'
 
             Returns a copy of new state array with the added move
         """
 
-        temp = [x[:] for x in state]
+        tmp_grid = [x[:] for x in grid]
         for i in xrange(6):
-            if temp[i][column] == ' ':
-                temp[i][column] = color
-                return temp
+            if tmp_grid[i][column] == ' ':
+                tmp_grid[i][column] = color
+                return tmp_grid
 
-    def _eval(self, state, color):
-        """ Simple heuristic to evaluate board configurations
-            Heuristic is (num of 4-in-a-rows)*99999 + (num of 3-in-a-rows)*100 +
-            (num of 2-in-a-rows)*10 - (num of opponent 4-in-a-rows)*99999 - (num of opponent
-            3-in-a-rows)*100 - (num of opponent 2-in-a-rows)*10
+    def _eval_game(self, depth, grid, player_color):
+        """ Evaluate the game with its grid
         """
-        if color == self._colors[0]:
-            o_color = self._colors[1]
+        if player_color == "x":
+            opp_color = "o"
         else:
-            o_color = self._colors[0]
+            opp_color = "x"
 
-        my_fours = self._check_streak(state, color, 4)
-        my_threes = self._check_streak(state, color, 3)
-        my_twos = self._check_streak(state, color, 2)
-        opp_fours = self._check_streak(state, o_color, 4)
-        # opp_threes = self._check_streak(state, o_color, 3)
-        # opp_twos = self._check_streak(state, o_color, 2)
-        if opp_fours > 0:
-            return -100000
+        ia_fours = self._check_streak(grid, player_color, 4)
+        ia_threes = self._check_streak(grid, player_color, 3)
+        ia_twos = self._check_streak(grid, player_color, 2)
+        human_fours = self._check_streak(grid, opp_color, 4)
+        human_threes = self._check_streak(grid, opp_color, 3)
+        human_twos = self._check_streak(grid, opp_color, 2)
+        if human_fours > 0:
+            return -100000 - depth
         else:
-            return my_fours * 100000 + my_threes * 100 + my_twos
+            return (ia_fours * 100000 + ia_threes * 100 + ia_twos * 10 + depth) - ((human_threes * 100) - human_twos * 10)
 
-    def _check_streak(self, state, color, streak):
+    def _check_streak(self, grid, color, streak):
         count = 0
         # for each piece in the board...
         for i in xrange(6):
             for j in xrange(7):
                 # ...that is of the color we're looking for...
-                if state[i][j].lower() == color.lower():
+                if grid[i][j].lower() == color.lower():
                     # check if a vertical streak starts at (i, j)
-                    count += self._check_vertical_streak(i, j, state, streak)
+                    count += self._check_vertical_streak(i, j, grid, streak)
 
                     # check if a horizontal four-in-a-row starts at (i, j)
-                    count += self._check_horizontal_streak(i, j, state, streak)
+                    count += self._check_horizontal_streak(i, j, grid, streak)
 
                     # check if a diagonal (either way) four-in-a-row starts at (i, j)
-                    count += self._check_diagonal_streak(i, j, state, streak)
+                    count += self._check_diagonal_streak(i, j, grid, streak)
         # return the sum of streaks of length 'streak'
         return count
 
-    def _check_vertical_streak(self, row, col, state, streak):
+    def _check_vertical_streak(self, row, col, grid, streak):
         consecutive_count = 0
         for i in xrange(row, 6):
-            if state[i][col].lower() == state[row][col].lower():
+            if grid[i][col].lower() == grid[row][col].lower():
                 consecutive_count += 1
             else:
                 break
@@ -468,10 +460,10 @@ class _ComputerPlayer(_Player):
         else:
             return 0
 
-    def _check_horizontal_streak(self, row, col, state, streak):
+    def _check_horizontal_streak(self, row, col, grid, streak):
         consecutive_count = 0
         for j in xrange(col, 7):
-            if state[row][j].lower() == state[row][col].lower():
+            if grid[row][j].lower() == grid[row][col].lower():
                 consecutive_count += 1
             else:
                 break
@@ -481,7 +473,7 @@ class _ComputerPlayer(_Player):
         else:
             return 0
 
-    def _check_diagonal_streak(self, row, col, state, streak):
+    def _check_diagonal_streak(self, row, col, grid, streak):
 
         total = 0
         # check for diagonals with positive slope
@@ -490,7 +482,7 @@ class _ComputerPlayer(_Player):
         for i in xrange(row, 6):
             if j > 6:
                 break
-            elif state[i][j].lower() == state[row][col].lower():
+            elif grid[i][j].lower() == grid[row][col].lower():
                 consecutive_count += 1
             else:
                 break
@@ -505,7 +497,7 @@ class _ComputerPlayer(_Player):
         for i in xrange(row, -1, -1):
             if j > 6:
                 break
-            elif state[i][j].lower() == state[row][col].lower():
+            elif grid[i][j].lower() == grid[row][col].lower():
                 consecutive_count += 1
             else:
                 break
