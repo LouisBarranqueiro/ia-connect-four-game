@@ -3,6 +3,8 @@ from connect_four import *
 
 
 class TestConnectFour(unittest.TestCase):
+    """ Tests ConnectFour class
+    """
     def setUp(self):
         self.connect_four = ConnectFour()
 
@@ -62,9 +64,15 @@ class TestConnectFour(unittest.TestCase):
         self.connect_four._grid = grid
         self.assertEqual(self.connect_four._is_connect_four(), True)
 
+    def test_is_full(self):
+        """ Check if the game detected that the grid is full
+        """
+        self.connect_four._round = CONNECT_FOUR_GRID_WIDTH * CONNECT_FOUR_GRID_HEIGHT + 1
+        self.assertEqual(self.connect_four._is_full(), True)
+
 
 class TestComputerPlayer(unittest.TestCase):
-    """ Test IA of the computer player
+    """ Test ComputerPlayer class
     """
 
     def setUp(self):
