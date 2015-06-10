@@ -30,7 +30,7 @@ class ConnectFour(object):
         self._players[1] = _ComputerPlayer(self._COLORS[1])
         # display players's status
         for i in xrange(2):
-            print('%s joue avec %s ' % (self._players[i]._type, self._COLORS[i]))
+            print('%s play with %s ' % (self._players[i]._type, self._COLORS[i]))
 
         # x always goes first
         self._current_player = self._players[0]
@@ -128,7 +128,6 @@ class ConnectFour(object):
         consecutive_count = 0
 
         if row + 3 < self._GRID_HEIGHT:
-            # search a connect four
             for i in xrange(4):
                 if self._grid[row][col].lower() == self._grid[row + i][col].lower():
                     consecutive_count += 1
@@ -155,7 +154,6 @@ class ConnectFour(object):
         consecutive_count = 0
 
         if col + 3 < self._GRID_WIDTH:
-            # search a connect four
             for i in xrange(4):
                 if self._grid[row][col].lower() == self._grid[row][col + i].lower():
                     consecutive_count += 1
@@ -182,7 +180,6 @@ class ConnectFour(object):
         consecutive_count = 0
         # check positive slope
         if row + 3 < self._GRID_HEIGHT and col + 3 < self._GRID_WIDTH:
-            # search a connect four
             for i in xrange(4):
                 if self._grid[row][col].lower() == self._grid[row + i][col + i].lower():
                     consecutive_count += 1
@@ -196,10 +193,10 @@ class ConnectFour(object):
                 else:
                     self._winner = self._players[1]
                 return True
+
         consecutive_count = 0
         # check negative slope
         if row - 3 >= 0 and col + 3 < self._GRID_WIDTH:
-            # search a connect four
             for i in xrange(4):
                 if self._grid[row][col].lower() == self._grid[row - i][col + i].lower():
                     consecutive_count += 1
@@ -245,13 +242,12 @@ class ConnectFour(object):
             if self._winner != None:
                 print(str(self._winner._type) + " is the winner!")
             else:
-                print("Game was a draw")
+                print("Game is a draw")
 
 
 class _Player(object):
     """ Abstract Player class
     """
-
     __metaclass__ = ABCMeta
 
     _type = None
@@ -268,11 +264,10 @@ class _Player(object):
 class _HumanPlayer(_Player):
     """ Human Player
     """
-
     def __init__(self, color):
         """
         Constructor
-        :param color: str represent the value entered in the grid for example: `o` or `x`
+        :param color: character entered in the grid for example: `o` or `x`
         """
         super(_HumanPlayer, self).__init__(color)
         self._type = "Human"
@@ -298,7 +293,6 @@ class _HumanPlayer(_Player):
 class _ComputerPlayer(_Player):
     """ Computer Player controlled by an IA (MinMax algorithm)
     """
-
     _DIFFICULTY = 5
     _colors = ["x", "o"]
 
@@ -313,14 +307,17 @@ class _ComputerPlayer(_Player):
 
     def get_move(self, grid):
         """
-        Return the best "move" (column index) calculated by IA
+        Returns the best "move" (column index) calculated by IA
         :param grid: the current grid of the game
         :return: the best move found by IA (MinMax algorithm)
         """
         return self._get_best_move(grid)
 
     def _get_best_move(self, grid):
-        """ Returns the best "move" (column index) and the associated alpha
+        """
+        Search and return the best "move" (column index)
+        :param grid: the grid of the connect four
+        :return best_move: the best "move" (column index)
         """
         # determine opponent's color
         if self._color == CONNECT_FOUR_COLORS[0]:
@@ -329,42 +326,42 @@ class _ComputerPlayer(_Player):
             human_color = CONNECT_FOUR_COLORS[0]
 
         # enumerate all legal moves
-        legal_moves = {}  # will map legal move states to their alpha values
+        # will map legal move states to their alpha values
+        legal_moves = {}
+        # check if the move is legal for each column
         for col in xrange(CONNECT_FOUR_GRID_WIDTH):
-            # if column i is a legal move...
             if self._is_legal_move(col, grid):
-                # make the move in column 'col' for curr_player
+                # simulate the move in column `col` for the current player
                 tmp_grid = self._simulate_move(grid, col, self._color)
                 legal_moves[col] = -self._search(self._DIFFICULTY - 1, tmp_grid, human_color)
 
         best_alpha = -99999999
         best_move = None
         moves = legal_moves.items()
-        # search the best `move` with the highest `alpha` value
+        # search the best "move" with the highest `alpha` value
         for move, alpha in moves:
             if alpha >= best_alpha:
                 best_alpha = alpha
                 best_move = move
-        print "ALPHA : %d" % best_alpha
+
         return best_move
 
     def _search(self, depth, grid, curr_player_color):
-        """ Searches the tree at depth 'depth'
-            By default, the state is the board, and curr_player is whomever
-            called this search
-
-            Returns the alpha value
+        """
+        Searches in the tree at depth = `depth` till it's not equal to 0. This function is recursive
+        :param depth: the current depth of the tree
+        :param grid: a grid of the connect four
+        :param curr_player_color: the color of the current player
+        :return alpha: value calculated with an heuristic. It represent the value of a "move" (column index)
         """
         # enumerate all legal moves from this state
         legal_moves = []
         for i in xrange(CONNECT_FOUR_GRID_HEIGHT):
-            # if column i is a legal move...
             if self._is_legal_move(i, grid):
                 # simulate the move in column i for curr_player
                 tmp_grid = self._simulate_move(grid, i, curr_player_color)
                 legal_moves.append(tmp_grid)
 
-        # if this node (state) is a terminal node or depth == 0...
         if depth == 0 or len(legal_moves) == 0 or self._game_is_over(grid):
             # return the heuristic value of node
             return self._eval_game(depth, grid, curr_player_color)
@@ -402,12 +399,13 @@ class _ComputerPlayer(_Player):
             return False
 
     def _simulate_move(self, grid, column, color):
-        """ Change a state object to reflect a player, denoted by color,
-            making a move at column 'column'
-
-            Returns a copy of new state array with the added move
         """
-
+        Simulate a "move" in the grid `grid` by the current player with its color `color.
+        :param grid: a grid of connect four
+        :param column: column index
+        :param color: color of a player
+        :return tmp_grid: the new grid with the "move" just added
+        """
         tmp_grid = [x[:] for x in grid]
         for i in xrange(CONNECT_FOUR_GRID_HEIGHT -1, -1, -1):
             if tmp_grid[i][column] == ' ':
@@ -415,25 +413,38 @@ class _ComputerPlayer(_Player):
                 return tmp_grid
 
     def _eval_game(self, depth, grid, player_color):
-        """ Evaluate the game with its grid
+        """
+        Evaluate the game with its grid
+        :param depth: the depth of the tree
+        :param grid: a grid of connect four
+        :param player_color: the current player's color
+        :return: alpha : value calculated with an heuristic. It represent the value of a "move" (column index)
         """
         if player_color == CONNECT_FOUR_COLORS[0]:
             opp_color = CONNECT_FOUR_COLORS[1]
         else:
             opp_color = CONNECT_FOUR_COLORS[0]
-
+        # get scores of human and IA player with theirs streaks
         ia_fours = self._check_streak(grid, player_color, 4)
         ia_threes = self._check_streak(grid, player_color, 3)
         ia_twos = self._check_streak(grid, player_color, 2)
         human_fours = self._check_streak(grid, opp_color, 4)
         human_threes = self._check_streak(grid, opp_color, 3)
         human_twos = self._check_streak(grid, opp_color, 2)
+        # calculate and return the alpha
         if human_fours > 0:
             return -100000 - depth
         else:
             return (ia_fours * 100000 + ia_threes * 100 + ia_twos * 10 + depth) - ((human_threes * 100) - human_twos * 10)
 
     def _check_streak(self, grid, color, streak):
+        """
+        Check for streaks of a color in the grid
+        :param grid: a grid of connect four
+        :param color: color of a player
+        :param streak: number of consecutive "color"
+        :return count: number of streaks founded
+        """
         count = 0
         # for each box in the grid...
         for i in xrange(CONNECT_FOUR_GRID_HEIGHT):
@@ -453,9 +464,16 @@ class _ComputerPlayer(_Player):
         return count
 
     def _check_vertical_streak(self, row, col, grid, streak):
+        """
+        Check for vertical streak starting at index [row][col] in the grid
+        :param row: row the grid
+        :param col: column of the grid
+        :param grid: a grid of connect four
+        :param streak: number of "color" consecutive
+        :return: 0: no streak found, 1: streak founded
+        """
         consecutive_count = 0
         if row + streak - 1 < CONNECT_FOUR_GRID_HEIGHT:
-            # search a connect four
             for i in xrange(streak):
                 if grid[row][col].lower() == grid[row + i][col].lower():
                     consecutive_count += 1
@@ -468,9 +486,16 @@ class _ComputerPlayer(_Player):
             return 0
 
     def _check_horizontal_streak(self, row, col, grid, streak):
+        """
+        Check for horizontal streak starting at index [row][col] in the grid
+        :param row: row the grid
+        :param col: column of the grid
+        :param grid: a grid of connect four
+        :param streak: number of "color" consecutive
+        :return: 0: no streak found, 1: streak founded
+        """
         consecutive_count = 0
         if col + streak - 1 < CONNECT_FOUR_GRID_WIDTH:
-            # search a connect four
             for i in xrange(streak):
                 if grid[row][col].lower() == grid[row][col + i].lower():
                     consecutive_count += 1
@@ -483,12 +508,19 @@ class _ComputerPlayer(_Player):
             return 0
 
     def _check_diagonal_streak(self, row, col, grid, streak):
-
+        """
+        Check for diagonal streak starting at index [row][col] in the grid
+        It check positive and negative slope
+        :param row: row the grid
+        :param col: column of the grid
+        :param grid: a grid of connect four
+        :param streak: number of "color" consecutive
+        :return total: number of streaks founded
+        """
         total = 0
         # check for diagonals with positive slope
         consecutive_count = 0
         if row + streak - 1 < CONNECT_FOUR_GRID_HEIGHT and col + streak - 1 < CONNECT_FOUR_GRID_WIDTH:
-            # search a connect four
             for i in xrange(streak):
                 if grid[row][col].lower() == grid[row + i][col + i].lower():
                     consecutive_count += 1
@@ -501,7 +533,6 @@ class _ComputerPlayer(_Player):
         # check for diagonals with negative slope
         consecutive_count = 0
         if row - streak + 1 >= 0 and col + streak - 1 < CONNECT_FOUR_GRID_WIDTH:
-            # search a connect four
             for i in xrange(streak):
                 if grid[row][col].lower() == grid[row - i][col + i].lower():
                     consecutive_count += 1
