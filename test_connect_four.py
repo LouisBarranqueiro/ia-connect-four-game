@@ -65,7 +65,7 @@ class TestConnectFour(unittest.TestCase):
         self.assertEqual(self.connect_four._is_connect_four(), True)
 
     def test_is_full(self):
-        """ Check if the game detected that the grid is full
+        """ Check if the game detects that the grid is full
         """
         self.connect_four._round = CONNECT_FOUR_GRID_WIDTH * CONNECT_FOUR_GRID_HEIGHT + 1
         self.assertEqual(self.connect_four._is_full(), True)
@@ -91,7 +91,7 @@ class TestComputerPlayer(unittest.TestCase):
             ['x', ' ', ' ', ' ', ' ', ' ', ' '],
             ['x', ' ', ' ', ' ', ' ', ' ', ' ']
         ]
-        self.assertEqual(self.connect_four._players[1]._check_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
 
     def test_check_horizontal_four(self):
         """ Check if horizontal connect four is detected by the computer player (IA)
@@ -104,7 +104,7 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             ['x', 'x', 'x', 'x', ' ', ' ', ' ']
         ]
-        self.assertEqual(self.connect_four._players[1]._check_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
 
     def test_check_diagonal_positive_four(self):
         """ Check if diagonal (positive slope) connect four is detected by the computer player (IA)
@@ -117,7 +117,7 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', 'x', ' ', ' ', ' ', ' ', ' '],
             ['x', ' ', ' ', ' ', ' ', ' ', ' ']
         ]
-        self.assertEqual(self.connect_four._players[1]._check_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
 
     def test_check_diagonal_negative_four(self):
         """ Check if diagonal (negative slope) connect four is detected by the computer player (IA)
@@ -130,7 +130,7 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', ' ', ' ', ' ', ' ', 'x', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', 'x']
         ]
-        self.assertEqual(self.connect_four._players[1]._check_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
 
     def test_ia_intelligence_1(self):
         """ Check if IA wants to win (attack)
