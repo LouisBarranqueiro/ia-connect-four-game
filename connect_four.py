@@ -61,9 +61,10 @@ class ConnectFour(object):
         # get the "move" (column) that the player played
         column = self._current_player.get_move(self._grid)
         # search the available line in the selected column
-        for i in xrange(self._GRID_HEIGHT):
+        for i in xrange(self._GRID_HEIGHT - 1, -1, -1):
             if self._grid[i][column] == ' ':
                 # set the color in the grid
+                print "i : %d" % i
                 self._grid[i][column] = self._current_player._color
                 self._check_status()
                 self._print_state()
@@ -100,7 +101,7 @@ class ConnectFour(object):
         :return: Boolean
         """
         # for each piece in the grid...
-        for i in xrange(self._GRID_HEIGHT):
+        for i in xrange(self._GRID_HEIGHT - 1, 0, -1):
             for j in xrange(self._GRID_WIDTH):
                 if self._grid[i][j] != ' ':
                     # check for vertical connect four
@@ -179,7 +180,6 @@ class ConnectFour(object):
         :return: Boolean
         """
         consecutive_count = 0
-
         # check positive slope
         if row + 3 < self._GRID_HEIGHT and col + 3 < self._GRID_WIDTH:
             # search a connect four
@@ -196,15 +196,16 @@ class ConnectFour(object):
                 else:
                     self._winner = self._players[1]
                 return True
-
+        consecutive_count = 0
         # check negative slope
-        if row - 3 >= 0 and col - 3 >= 0:
+        if row - 3 >= 0 and col + 3 < self._GRID_WIDTH:
             # search a connect four
             for i in xrange(4):
-                if self._grid[row][col].lower() == self._grid[row - i][col - i].lower():
+                if self._grid[row][col].lower() == self._grid[row - i][col + i].lower():
                     consecutive_count += 1
                 else:
                     break
+
             # define the winner
             if consecutive_count == 4:
                 if self._players[0]._color.lower() == self._grid[row][col].lower():
@@ -224,10 +225,10 @@ class ConnectFour(object):
         print("             Round: " + str(self._round))
         print("")
         # print the grid
-        for i in xrange(self._GRID_HEIGHT, 0, -1):
+        for i in xrange(self._GRID_HEIGHT):
             print("\t"),
             for j in xrange(self._GRID_WIDTH):
-                print("| " + str(self._grid[i - 1][j])),
+                print("| " + str(self._grid[i][j])),
             print("|")
         print("\t"),
         # print the bottom of the grid with columns index
@@ -329,7 +330,7 @@ class _ComputerPlayer(_Player):
 
         # enumerate all legal moves
         legal_moves = {}  # will map legal move states to their alpha values
-        for col in xrange(CONNECT_FOUR_GRID_HEIGHT):
+        for col in xrange(CONNECT_FOUR_GRID_WIDTH):
             # if column i is a legal move...
             if self._is_legal_move(col, grid):
                 # make the move in column 'col' for curr_player
@@ -344,7 +345,7 @@ class _ComputerPlayer(_Player):
             if alpha >= best_alpha:
                 best_alpha = alpha
                 best_move = move
-
+        print "ALPHA : %d" % best_alpha
         return best_move
 
     def _search(self, depth, grid, curr_player_color):
@@ -384,7 +385,7 @@ class _ComputerPlayer(_Player):
     def _is_legal_move(self, column, grid):
         """ Boolean function to check if a move (column) is a legal move
         """
-        for i in xrange(CONNECT_FOUR_GRID_HEIGHT - 1):
+        for i in xrange(CONNECT_FOUR_GRID_HEIGHT - 1, -1, -1):
             if grid[i][column] == ' ':
                 # once we find the first empty, we know it's a legal move
                 return True
@@ -393,9 +394,9 @@ class _ComputerPlayer(_Player):
         return False
 
     def _game_is_over(self, grid):
-        if self._check_streak(grid, self._colors[0], 4) >= 1:
+        if self._check_streak(grid, CONNECT_FOUR_COLORS[0], 4) > 0:
             return True
-        elif self._check_streak(grid, self._colors[1], 4) >= 1:
+        elif self._check_streak(grid, CONNECT_FOUR_COLORS[1], 4) > 0:
             return True
         else:
             return False
@@ -408,7 +409,7 @@ class _ComputerPlayer(_Player):
         """
 
         tmp_grid = [x[:] for x in grid]
-        for i in xrange(CONNECT_FOUR_GRID_WIDTH):
+        for i in xrange(CONNECT_FOUR_GRID_HEIGHT -1, -1, -1):
             if tmp_grid[i][column] == ' ':
                 tmp_grid[i][column] = color
                 return tmp_grid
@@ -435,8 +436,8 @@ class _ComputerPlayer(_Player):
     def _check_streak(self, grid, color, streak):
         count = 0
         # for each box in the grid...
-        for i in xrange(CONNECT_FOUR_GRID_HEIGHT - 1):
-            for j in xrange(CONNECT_FOUR_GRID_WIDTH - 1):
+        for i in xrange(CONNECT_FOUR_GRID_HEIGHT):
+            for j in xrange(CONNECT_FOUR_GRID_WIDTH):
                 # ...that is of the color we're looking for...
                 if grid[i][j].lower() == color.lower():
                     # check if a vertical streak starts at index [i][j] of the grid game
@@ -453,26 +454,30 @@ class _ComputerPlayer(_Player):
 
     def _check_vertical_streak(self, row, col, grid, streak):
         consecutive_count = 0
-        for i in xrange(row, CONNECT_FOUR_GRID_HEIGHT):
-            if grid[i][col].lower() == grid[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
+        if row + streak - 1 < CONNECT_FOUR_GRID_HEIGHT:
+            # search a connect four
+            for i in xrange(streak):
+                if grid[row][col].lower() == grid[row + i][col].lower():
+                    consecutive_count += 1
+                else:
+                    break
 
-        if consecutive_count >= streak:
+        if consecutive_count == streak:
             return 1
         else:
             return 0
 
     def _check_horizontal_streak(self, row, col, grid, streak):
         consecutive_count = 0
-        for j in xrange(col, CONNECT_FOUR_GRID_WIDTH):
-            if grid[row][j].lower() == grid[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
+        if col + streak - 1 < CONNECT_FOUR_GRID_WIDTH:
+            # search a connect four
+            for i in xrange(streak):
+                if grid[row][col].lower() == grid[row][col + i].lower():
+                    consecutive_count += 1
+                else:
+                    break
 
-        if consecutive_count >= streak:
+        if consecutive_count == streak:
             return 1
         else:
             return 0
@@ -482,32 +487,28 @@ class _ComputerPlayer(_Player):
         total = 0
         # check for diagonals with positive slope
         consecutive_count = 0
-        j = col
-        for i in xrange(row, CONNECT_FOUR_GRID_WIDTH):
-            if j > CONNECT_FOUR_GRID_WIDTH:
-                break
-            elif grid[i][j].lower() == grid[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
-            j += 1  # increment column when row is incremented
+        if row + streak - 1 < CONNECT_FOUR_GRID_HEIGHT and col + streak - 1 < CONNECT_FOUR_GRID_WIDTH:
+            # search a connect four
+            for i in xrange(streak):
+                if grid[row][col].lower() == grid[row + i][col + i].lower():
+                    consecutive_count += 1
+                else:
+                    break
 
-        if consecutive_count >= streak:
+        if consecutive_count == streak:
             total += 1
 
         # check for diagonals with negative slope
         consecutive_count = 0
-        j = col
-        for i in xrange(row, -1, -1):
-            if j > CONNECT_FOUR_GRID_WIDTH:
-                break
-            elif grid[i][j].lower() == grid[row][col].lower():
-                consecutive_count += 1
-            else:
-                break
-            j += 1  # increment column when row is incremented
+        if row - streak + 1 >= 0 and col + streak - 1 < CONNECT_FOUR_GRID_WIDTH:
+            # search a connect four
+            for i in xrange(streak):
+                if grid[row][col].lower() == grid[row - i][col + i].lower():
+                    consecutive_count += 1
+                else:
+                    break
 
-        if consecutive_count >= streak:
+        if consecutive_count == streak:
             total += 1
 
         return total
