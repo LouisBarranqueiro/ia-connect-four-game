@@ -1,4 +1,5 @@
 import os
+import random
 from abc import ABCMeta, abstractmethod
 
 CONNECT_FOUR_GRID_WIDTH = 7
@@ -33,8 +34,8 @@ class ConnectFour(object):
         for i in xrange(2):
             print('%s play with %s ' % (self._players[i]._type, self._COLORS[i]))
 
-        # x always goes first
-        self._current_player = self._players[0]
+        # choose the first player randomly
+        self._current_player = self._players[random.randint(0, 1)]
         # init grid with white spaces
         self._grid = []
         for i in xrange(self._GRID_HEIGHT):
@@ -43,10 +44,31 @@ class ConnectFour(object):
                 self._grid[i].append(' ')
 
     def start(self):
-        """ Start the game
+        """ Start a game
         """
         while not self._finished:
             self._next_move()
+
+    def start_new(self):
+        """ Start a new game
+        """
+        # cross-platform clear screen
+        os.system(['clear', 'cls'][os.name == 'nt'])
+        # reset game status
+        self._round = 1
+        self._finished = False
+        self._winner = None
+        # choose the first player randomly
+        self._current_player = self._players[random.randint(0, 1)]
+        # clear grid with white spaces
+        self._grid = []
+        for i in xrange(self._GRID_HEIGHT):
+            self._grid.append([])
+            for j in xrange(self._GRID_WIDTH):
+                self._grid[i].append(' ')
+
+        # start a new game
+        self.start()
 
     def _switch_player(self):
         """ Switch the current player
@@ -65,7 +87,6 @@ class ConnectFour(object):
         for i in xrange(self._GRID_HEIGHT - 1, -1, -1):
             if self._grid[i][column] == ' ':
                 # set the color in the grid
-                print "i : %d" % i
                 self._grid[i][column] = self._current_player._color
                 self._check_status()
                 self._print_state()
@@ -101,7 +122,7 @@ class ConnectFour(object):
         Check if there is a connect four in the grid
         :return: Boolean
         """
-        # for each piece in the grid...
+        # for each box of the grid
         for i in xrange(self._GRID_HEIGHT - 1, 0, -1):
             for j in xrange(self._GRID_WIDTH):
                 if self._grid[i][j] != ' ':
