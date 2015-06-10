@@ -5,6 +5,7 @@ from connect_four import *
 class TestConnectFour(unittest.TestCase):
     """ Tests ConnectFour class
     """
+
     def setUp(self):
         self.connect_four = ConnectFour()
 
@@ -12,12 +13,12 @@ class TestConnectFour(unittest.TestCase):
         """ Check if vertical connect four is detected
         """
         grid = [
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' ']
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ']
         ]
         self.connect_four._grid = grid
         self.assertEqual(self.connect_four._is_connect_four(), True)
@@ -25,13 +26,14 @@ class TestConnectFour(unittest.TestCase):
     def test_check_horizontal_four(self):
         """ Check if horizontal connect four is detected
         """
+
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', 'x', 'x', 'x', ' ', ' ', ' ']
+            [CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], ' ', ' ', ' ']
         ]
         self.connect_four._grid = grid
         self.assertEqual(self.connect_four._is_connect_four(), True)
@@ -42,10 +44,10 @@ class TestConnectFour(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', 'x', ' ', ' ', ' '],
-            [' ', ' ', 'x', ' ', ' ', ' ', ' '],
-            [' ', 'x', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' ']
+            [' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' ']
         ]
         self.connect_four._grid = grid
         self.assertEqual(self.connect_four._is_connect_four(), True)
@@ -56,10 +58,10 @@ class TestConnectFour(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', 'x', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', 'x', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', 'x', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', 'x']
+            [' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', CONNECT_FOUR_COLORS[0]]
         ]
         self.connect_four._grid = grid
         self.assertEqual(self.connect_four._is_connect_four(), True)
@@ -86,12 +88,12 @@ class TestComputerPlayer(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' ']
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' ']
         ]
-        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, CONNECT_FOUR_COLORS[0], 4), 1)
 
     def test_check_horizontal_four(self):
         """ Check if horizontal connect four is detected by the computer player (IA)
@@ -102,9 +104,9 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            ['x', 'x', 'x', 'x', ' ', ' ', ' ']
+            [CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], ' ', ' ', ' ']
         ]
-        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, CONNECT_FOUR_COLORS[0], 4), 1)
 
     def test_check_diagonal_positive_four(self):
         """ Check if diagonal (positive slope) connect four is detected by the computer player (IA)
@@ -112,12 +114,12 @@ class TestComputerPlayer(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', 'x', ' ', ' ', ' '],
-            [' ', ' ', 'x', ' ', ' ', ' ', ' '],
-            [' ', 'x', ' ', ' ', ' ', ' ', ' '],
-            ['x', ' ', ' ', ' ', ' ', ' ', ' ']
+            [' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' ']
         ]
-        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, CONNECT_FOUR_COLORS[0], 4), 1)
 
     def test_check_diagonal_negative_four(self):
         """ Check if diagonal (negative slope) connect four is detected by the computer player (IA)
@@ -125,12 +127,12 @@ class TestComputerPlayer(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', 'x', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', 'x', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', 'x', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', 'x']
+            [' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', CONNECT_FOUR_COLORS[0], ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', CONNECT_FOUR_COLORS[0]]
         ]
-        self.assertEqual(self.connect_four._players[1]._find_streak(grid, "x", 4), 1)
+        self.assertEqual(self.connect_four._players[1]._find_streak(grid, CONNECT_FOUR_COLORS[0], 4), 1)
 
     def test_ia_intelligence_1(self):
         """ Check if IA wants to win (attack)
@@ -139,10 +141,10 @@ class TestComputerPlayer(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', 'o', 'x', ' ', ' ', ' '],
-            [' ', 'o', 'x', 'x', ' ', ' ', ' '],
-            [' ', 'o', 'x', 'x', ' ', ' ', ' '],
-            [' ', 'o', 'x', 'o', 'x', ' ', 'o']
+            [' ', ' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], ' ', CONNECT_FOUR_COLORS[1]]
         ]
         self.assertEqual(self.connect_four._players[1].get_move(grid), 1)
 
@@ -152,10 +154,10 @@ class TestComputerPlayer(unittest.TestCase):
         grid = [
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', 'o', ' ', ' ', ' ', ' '],
-            [' ', 'x', 'x', 'x', ' ', ' ', ' '],
-            [' ', 'o', 'x', 'x', ' ', ' ', 'o'],
-            [' ', 'o', 'x', 'o', 'x', ' ', 'o']
+            [' ', ' ', CONNECT_FOUR_COLORS[1], ' ', ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], ' ', ' ', ' '],
+            [' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[0], ' ', ' ', CONNECT_FOUR_COLORS[1]],
+            [' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], ' ', CONNECT_FOUR_COLORS[1]]
         ]
         self.assertEqual(self.connect_four._players[1].get_move(grid), 1)
 
