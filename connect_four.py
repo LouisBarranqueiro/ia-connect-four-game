@@ -123,7 +123,7 @@ class ConnectFour(object):
         :return: Boolean
         """
         # for each box of the grid
-        for i in xrange(self._GRID_HEIGHT - 1, 0, -1):
+        for i in xrange(self._GRID_HEIGHT - 1, -1, -1):
             for j in xrange(self._GRID_WIDTH):
                 if self._grid[i][j] != ' ':
                     # check for vertical connect four
@@ -310,7 +310,7 @@ class _HumanPlayer(_Player):
                 return column
             else:
                 column = None
-                print("Please, enter a number between 0 and 6")
+                print("Please, enter a number between 1 and 7")
 
 
 class _ComputerPlayer(_Player):
