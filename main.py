@@ -4,7 +4,6 @@ def main():
     """ Play a game!
     """
     connect_four = ConnectFour()
-
     # start the game
     connect_four.start()
 
