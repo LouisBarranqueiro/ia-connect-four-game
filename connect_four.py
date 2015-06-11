@@ -457,7 +457,7 @@ class _ComputerPlayer(_Player):
         if human_fours > 0:
             return -100000 - depth
         else:
-            return (ia_fours * 100000 + ia_threes * 100 + ia_twos * 10 + depth) - ((human_threes * 100) - human_twos * 10)
+            return (ia_fours * 100000 + ia_threes * 100 + ia_twos * 10) - (human_threes * 100 - human_twos * 10) + depth
 
     def _find_streak(self, grid, color, streak):
         """
