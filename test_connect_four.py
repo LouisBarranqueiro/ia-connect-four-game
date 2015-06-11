@@ -149,6 +149,19 @@ class TestComputerPlayer(unittest.TestCase):
         self.assertEqual(self.connect_four._players[1].get_move(grid), 1)
 
     def test_ia_intelligence_2(self):
+        """ Check if IA take the right choice (attack)
+        """
+        grid = [
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        ]
+        self.assertEqual(self.connect_four._players[1].get_move(grid), 3)
+
+    def test_ia_intelligence_3(self):
         """ Check if IA take the right choice (defense)
         """
         grid = [
@@ -160,6 +173,20 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], CONNECT_FOUR_COLORS[1], CONNECT_FOUR_COLORS[0], ' ', CONNECT_FOUR_COLORS[1]]
         ]
         self.assertEqual(self.connect_four._players[1].get_move(grid), 1)
+
+    def test_ia_intelligence_4(self):
+        """ Check if IA take the right choice (defense)
+        """
+        grid = [
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
+        ]
+        self.assertEqual(self.connect_four._players[1].get_move(grid), 2)
+
 
 
 if __name__ == '__main__':
