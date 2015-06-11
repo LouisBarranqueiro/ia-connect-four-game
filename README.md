@@ -20,3 +20,7 @@ To run them : `python test_connect_four.py`
 
 The heuristic used to evaluate a game state is :
 `(ia_fours * 100000 + ia_threes * 100 + ia_twos * 10 + depth) - (human_threes * 100 - human_twos * 10)`
+
+## License
+
+ia-connect-four-game is released under the terms of the [MIT License](https://github.com/LouisBarranqueiro/ia-connect-four-game/blob/master/LICENSE)
