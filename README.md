@@ -1,5 +1,5 @@
 # ia-connect-four-game
-Connect four game against IA player (MinMax algorithm) for a small project in university
+Connect four game against IA player (MinMax algorithm) written in python for a small project in university
 
 * **Author:** Louis Barranqueiro
 * **Python:** v2.7.6
