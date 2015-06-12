@@ -18,7 +18,7 @@ To run them : `python test_connect_four.py`
 
 #### Heuristic
 
-The heuristic used to evaluate a game state is : count of ia's four-in-row * 1000 + count of ia's three-in-row * 100 + count of ia's two-in-row * 10 - count of human's four-in-row * 1000 + count of human's three-in-row * 100 + count of human's two-in-row * 10 + current depth of tree.  
+The heuristic used to evaluate a game state is : count of ia's four-in-row * 1000 + count of ia's three-in-row * 100 + count of ia's two-in-row * 10 - count of human's three-in-row * 100 - count of human's two-in-row * 10 + current depth of tree.  
 **python formula:** `(ia_fours * 100000 + ia_threes * 100 + ia_twos * 10) - (human_threes * 100 - human_twos * 10) + depth`
 
 ## License
