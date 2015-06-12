@@ -159,7 +159,7 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
         ]
-        self.assertEqual(self.connect_four._players[1].get_move(grid), 3)
+        self.assertEqual(self.connect_four._players[1].get_move(grid), 5)
 
     def test_ia_intelligence_3(self):
         """ Check if IA take the right choice (defense)
@@ -185,7 +185,7 @@ class TestComputerPlayer(unittest.TestCase):
             [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             [CONNECT_FOUR_COLORS[0], ' ', ' ', ' ', ' ', ' ', ' '],
         ]
-        self.assertEqual(self.connect_four._players[1].get_move(grid), 2)
+        self.assertEqual(self.connect_four._players[1].get_move(grid), 6)
 
 
 
