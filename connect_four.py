@@ -1,5 +1,6 @@
 import os
 import random
+import time
 from abc import ABCMeta, abstractmethod
 
 CONNECT_FOUR_GRID_WIDTH = 7
@@ -341,6 +342,8 @@ class _ComputerPlayer(_Player):
         :param grid: the grid of the connect four
         :return best_move: the best "move" (column index)
         """
+        # start time
+        start_time = int(round(time.time() * 1000))
         # determine opponent's color
         if self._color == CONNECT_FOUR_COLORS[0]:
             human_color = CONNECT_FOUR_COLORS[1]
@@ -365,6 +368,9 @@ class _ComputerPlayer(_Player):
             if alpha >= best_alpha:
                 best_alpha = alpha
                 best_move = move
+
+        end_time = int(round(time.time() * 1000))
+        print "response time: %d" % (end_time - start_time)
 
         return best_move
 
@@ -457,7 +463,7 @@ class _ComputerPlayer(_Player):
         if human_fours > 0:
             return -100000 - depth
         else:
-            return (ia_fours * 100000 + ia_threes * 100 + ia_twos * 10) - (human_threes * 100 - human_twos * 10) + depth
+            return (ia_fours * 100000 + ia_threes * 100 + ia_twos * 10) - (human_threes * 100 + human_twos * 10) + depth
 
     def _find_streak(self, grid, color, streak):
         """
